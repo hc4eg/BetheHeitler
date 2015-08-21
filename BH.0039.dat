@@ -1,0 +1,26 @@
+#asdgasdh
+#asdfs
+#dshj
+#gfhjgfk
+#asdgshasd
+#gfhkll;
+#asfghdgsh
+#sdfhk
+#ghk
+#dfhjk
+#sdfjk
+#sdfhj
+Event: 413
+Input:   60     -0    0.02727     0.1831    -0    -0
+Monitor: e-    59.72  0.02727     0.1831    -0.1774    -2.459
+Detector: 1
+VDC:      63.2   0.3047    767    -771.1
+Paddle: 18	 2.392	   2.38	  7.265
+Paddle: 19	 3.633	   3.596  7.315
+Event: 842
+Input:   60      -0    0.000913   -0.1663     -0    -0
+Monitor: e+     55.41    0.0009084     -0.1663   -16.45    7.105
+Monitor: e-     3.546    0.00009772    -0.1664    213.8   -184.3
+Detector: 0
+VDC:     -56     2.06    -740.3     -759
+Paddle: 13	 2.339	 2.203	    7.267
