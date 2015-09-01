@@ -58,7 +58,7 @@ public:
 void InInput(ifstream& datafile, Input& input){ 
   datafile >> input.energy >> input.delta >> input.x >>  input.y >> input.theta >> input.phi;
   datafile.ignore(200, '\n');
-  cout << "An input has been read" << endl;
+  //cout << "An input has been read" << endl;
 }
 
 void InMonitor(ifstream& datafile, vector<Monitor>& monitors){
@@ -72,13 +72,13 @@ void InMonitor(ifstream& datafile, vector<Monitor>& monitors){
   monitors.push_back(temp);
 
   datafile.ignore(200,'\n');
-  cout << "A monitor has been read" << endl;
+  //cout << "A monitor has been read" << endl;
 }
 
 void InVDC(ifstream& datafile, VDC& vdc){
   datafile >> vdc.x_f >> vdc.y_f >> vdc.theta_f >> vdc.phi_f;
   datafile.ignore(200,'\n');
-  cout << "A VDC has been read" << endl;
+  //cout << "A VDC has been read" << endl;
 }
 
 void InPaddle(ifstream& datafile, vector<Paddle>& paddles){
@@ -95,7 +95,7 @@ void InDetectors(ifstream& datafile, vector<Detector>& detectors/*,Int_t& detect
   // only add detector_num here, info of VDC and Paddles are in InVDC and InPaddle function.
   detectors.push_back(temp);
   datafile.ignore(200,'\n');
-  cout << "A dectector array number has been read" << endl;
+  cout << "A dectector array number "<< temp.detector_num <<" has been read" << endl;
 }
 
 void ProcessEvent(ifstream& datafile, BH_Event* event, bool& newevent, string& linetitle, Int_t& detector_index)
@@ -105,8 +105,8 @@ void ProcessEvent(ifstream& datafile, BH_Event* event, bool& newevent, string& l
     datafile.ignore(200,'\n');
     cout << "A new event " << event->event_num <<" has been read" << endl;
   }
-  datafile >> linetitle;
   
+  datafile >> linetitle;  
   //cout << "Linetitle is " << linetitle << endl; 
   if(linetitle=="Input:"){        
     InInput(datafile, event->input);
@@ -128,14 +128,14 @@ void ProcessEvent(ifstream& datafile, BH_Event* event, bool& newevent, string& l
   }
   else if(linetitle=="Event:"){
     newevent=true;
-    if(newevent==true)
-    cout << "newevent has been changed to true." << endl;
+    //if(newevent==true)
+      //cout << "newevent has been changed to true." << endl;
   }
   //else datafile.ignore(200,'\n');
 }
 
 void MakeTree3(void){
-  //declare data to be transformed to ttree
+  //Declare data to be transformed to ttree
   //For each BH_Event, there are 1 event_num,1 or 2 Monitors, 1 Input, and 1 or 2 Detectors
   //For each Detector, there are 1 VDC, and possible multiple Paddles
   //open the .dat file needed
