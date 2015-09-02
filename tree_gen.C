@@ -26,12 +26,12 @@ struct Input{
   Float_t phi;
 };
 
-  struct VDC{
+struct VDC{
     Float_t x_f;
     Float_t y_f;
     Float_t theta_f;
     Float_t phi_f;
-  };
+};
 
 struct Paddle{
   Int_t paddle_num;
@@ -41,8 +41,8 @@ struct Paddle{
 };
 
 struct Detector{
-  Int_t detector_num;
-  VDC vdc;
+  //Int_t detector_num;
+  vector<VDC> vdc;
   vector<Paddle> paddles;
 };
 
@@ -76,8 +76,10 @@ void InMonitor(ifstream& datafile, vector<Monitor>& monitors){
   //cout << "A monitor has been read" << endl;
 }
 
-void InVDC(ifstream& datafile, VDC& vdc){
-  datafile >> vdc.x_f >> vdc.y_f >> vdc.theta_f >> vdc.phi_f;
+void InVDC(ifstream& datafile, vector<VDC>& vdc){
+  VDC temp;
+  datafile >> temp.x_f >> temp.y_f >> temp.theta_f >> temp.phi_f;
+  vdc.push_back(temp);
   datafile.ignore(200,'\n');
   //cout << "A VDC has been read" << endl;
 }
@@ -89,18 +91,25 @@ void InPaddle(ifstream& datafile, vector<Paddle>& paddles){
   datafile.ignore(200,'\n');
   cout << "A Paddle has been read"<< endl;
 }
-
+/*
 void InDetectors(ifstream& datafile, Detector& detector, Int_t& detector_flag){
   Detector temp;
   datafile >> temp.detector_num;
+  detector_flag = temp.detector_num;
   // only add detector_num here, info of VDC and Paddles are in InVDC and InPaddle function.
   detector.push_back(temp);
   datafile.ignore(200,'\n');
   cout << "A dectector array number "<< temp.detector_num <<" has been read" << endl;
+  }*/
+
+void SetDetector(ifstream& datafile, Int_t& detector_flag){
+  datafile >> detector_flag;
+  datafile.ignore(200,'\n');
 }
 
 void ProcessEvent(ifstream& datafile, BH_Event* event, bool& newevent, string& linetitle, Int_t& detector_flag)
 {
+  while(datafile && newevent == false){
   if(linetitle=="Event:") {
     datafile >> event->event_num;
     datafile.ignore(200,'\n');
@@ -116,21 +125,35 @@ void ProcessEvent(ifstream& datafile, BH_Event* event, bool& newevent, string& l
     InMonitor(datafile, event->monitors);
   }
   else if(linetitle=="Detector:"){
-    InDetectors(datafile, event->detectors);
-    detector_index++;
+    SetDetector(datafile, detector_flag);
+    //InDetectors(datafile, event->detectors, detector_flag);
   }
-  else if(linetitle=="VDC:"){ 
-    InVDC(datafile, event->detectors.at(detector_index).vdc);
+  else if(linetitle=="VDC:"){
+    
+    //InVDC(datafile, event->detectors.at(detector_index).vdc);
+    if(detector_flag == 0){
+      InVDC(datafile, event->detector0.vdc);
+    }
+    else if(detector_flag == 1){
+      InVDC(datafile,event->detector1.vdc);
+    }
   }
   else if(linetitle=="Paddle:"){
-    cout << "Adding paddles for detector array index number: " << detector_index << endl;
-    InPaddle(datafile, event->detectors.at(detector_index).paddles);
+    cout << "Adding paddles for detector number: " << detector_flag << endl;
+    if(detector_flag == 0){
+      InPaddle(datafile, event->detector0.paddles);
+    }
+    else if(detector_flag == 1){
+      InPaddle(datafile,event->detector1.paddles);
+    }
     //datafile.ignore(200,'\n');
   }
   else if(linetitle=="Event:"){
     newevent=true;
     //if(newevent==true)
       //cout << "newevent has been changed to true." << endl;
+  }
+  
   }
   //else datafile.ignore(200,'\n');
 }
@@ -190,13 +213,16 @@ void MakeTree(void){
   while(datafile){
     //data fill for a single evnet:
     event->monitors.clear();
-    event->detectors.clear();
-    Int_t detector_index=-1;
+    //event->detectors.clear();
+    event->detector1.paddles.clear();
+    event->detector0.paddles.clear();
+    event->detector1.vdc.clear();
+    event->detector0.vdc.clear();
+    
+    Int_t detector_flag=-1;
 
-    while(datafile && newevent==false){
-      ProcessEvent(datafile, event, newevent,linetitle, detector_index);
-      if(!datafile) break;
-    }
+    ProcessEvent(datafile, event, newevent,linetitle, detector_flag);
+
     tree->Fill();
     newevent=false;
     if(!datafile) break;
